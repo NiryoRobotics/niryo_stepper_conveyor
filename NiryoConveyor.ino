@@ -54,7 +54,8 @@ int digital_input_pin = 0;  // IR digital input
 float vcc = 4.272; // Voltage divider input voltage
 int resistor = 10; // 10kohm
 int k = 25; //Slope
-
+float EMA_a = 0.4;      //initialization of EMA alpha
+int EMA_S = 0;
 
 void autonomeConveyorControl(); // fonction to drive the conveyor with the control box
 
@@ -79,7 +80,7 @@ void setup() {
   relaxed_mode_with_resistance();
   pinMode(potentiometer_pin, INPUT_PULLUP);
   pinMode(digital_input_pin, INPUT);
-
+  EMA_S = analogRead(potentiometer_pin);  //set EMA S for t=1
   SerialUSB.println("-------------- SETUP FINISHED --------------");
 }
 
@@ -126,12 +127,9 @@ void loop() {
 void autonomeConveyorControl()
 {
   int potentiometer_value = analogRead(potentiometer_pin);
-  float adc_value = (3.3 * potentiometer_value * resistor * k) / ((1024 * vcc) - (3.3 * potentiometer_value)); // linearizing  ADC value
- // if(potentiometer_value == 1023)  {
-   // return; 
-  //}
-  SerialUSB.println(potentiometer_value);
-  SerialUSB.println(digitalRead(digital_input_pin));
+  EMA_S = (EMA_a * potentiometer_value) + ((1 - EMA_a) * EMA_S); //run the EMA
+  float adc_value = (3.3 * EMA_S * resistor * k) / ((1024 * vcc) - (3.3 * EMA_S)); // linearizing  ADC value
+
   if ( adc_value <= 300) {
     external_conveyor_speed = map((int)adc_value, 0, 300, 100, 0);
     external_conveyor_direction = 1;
@@ -147,7 +145,7 @@ void autonomeConveyorControl()
   {
     external_conveyor_speed = 0;
   }
-  //SerialUSB.println(adc_value);
+
   // if sensor detect an object or the speed == 0 , stop conveyor
   if ((external_conveyor_speed == 0) or (digitalRead(digital_input_pin) == LOW) or (potentiometer_value == 1023))
   {
@@ -158,7 +156,6 @@ void autonomeConveyorControl()
   {
     fan_HIGH();
     delay_steps = (10 * ( 100 - external_conveyor_speed)) + 10;
-    //SerialUSB.println(external_conveyor_speed);
     output(-1800 * external_conveyor_direction * steps_position / 3, uMAX);
     steps_position = steps_position + 1;
     delayMicroseconds(delay_steps);

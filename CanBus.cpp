@@ -73,6 +73,10 @@ void CanBus::controlConveyor()
       else if (conveyor_speed < 49)   {
         delay_steps = (-40.75 * conveyor_speed) + 2407;
       }
+    if( conveyor_direction == 255) 
+      {
+        conveyor_direction = -1;
+      }
       // delay_steps = (10 * (100 - conveyor_speed)) + 200;
       output(-1800 * conveyor_direction * steps_position / 8, UMAX_80_PERCENT); // 32 microsteps -> more precision
       steps_position = steps_position + 1;
