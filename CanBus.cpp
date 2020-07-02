@@ -56,9 +56,9 @@ void CanBus::setup()
 
 void CanBus::controlConveyor()
 {
+
   if (conveyor_status)
   {
-    //SerialUSB.println(conveyor_speed);
     if (conveyor_speed == 0)
     {
       relaxed_mode_with_resistance();
@@ -73,7 +73,7 @@ void CanBus::controlConveyor()
       else if (conveyor_speed < 49)   {
         delay_steps = (-40.75 * conveyor_speed) + 2407;
       }
-    if( conveyor_direction == 255) 
+      if ( conveyor_direction == 255)
       {
         conveyor_direction = -1;
       }
@@ -97,7 +97,7 @@ void CanBus::readData()
   unsigned char rxBuf[8];
   can_driver->readMsgBuf(&rxId, &len, rxBuf);
   // read data (len 8) : 291 micros, (len : 1) : 224 micros
-  
+
   // check id is standard, not extended
   if ((rxId & 0x80000000) == 0x80000000) {
     SerialUSB.println("Extended ID, nop nop nop.");

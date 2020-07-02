@@ -52,7 +52,7 @@ int external_conveyor_direction = 1;
 int potentiometer_pin = A0;   // external_conveyor_speed potentiometer
 int digital_input_pin = 0;  // IR digital input
 float vcc = 4.272; // Voltage divider input voltage
-int resistor = 10; // 10kohm
+int resistor = 4.3; // 10kohm
 int k = 25; //Slope
 float EMA_a = 0.4;      //initialization of EMA alpha
 int EMA_S = 0;
@@ -129,21 +129,22 @@ void autonomeConveyorControl()
   int potentiometer_value = analogRead(potentiometer_pin);
   EMA_S = (EMA_a * potentiometer_value) + ((1 - EMA_a) * EMA_S); //run the EMA
   float adc_value = (3.3 * EMA_S * resistor * k) / ((1024 * vcc) - (3.3 * EMA_S)); // linearizing  ADC value
-
-  if ( adc_value <= 300) {
-    external_conveyor_speed = map((int)adc_value, 0, 300, 100, 0);
+  if ( adc_value <= 90) {
+    external_conveyor_speed = map((int)adc_value, 0, 90, 100, 0);
     external_conveyor_direction = 1;
+
   }
 
-  else if (adc_value > 470)
+  else if (adc_value > 144)
   {
-    external_conveyor_speed = map((int)adc_value, 470, 800, 0, 100);
+    external_conveyor_speed = map((int)adc_value, 145, 235, 0, 100);
     external_conveyor_direction = -1;
-    if (adc_value > 800) external_conveyor_speed = 100;
+    if (adc_value > 235) external_conveyor_speed = 100;
   }
-  else if ((adc_value > 300) and (adc_value <= 470))
+  else if ((adc_value > 90) and (adc_value <= 144))
   {
     external_conveyor_speed = 0;
+
   }
 
   // if sensor detect an object or the speed == 0 , stop conveyor
@@ -155,9 +156,12 @@ void autonomeConveyorControl()
   else
   {
     fan_HIGH();
-    delay_steps = (10 * ( 100 - external_conveyor_speed)) + 10;
+    delay_steps = (-10 * external_conveyor_speed) + 1150;
+
+    //delay_steps = (10 * ( 100 - external_conveyor_speed)) + 10;
     output(-1800 * external_conveyor_direction * steps_position / 3, uMAX);
     steps_position = steps_position + 1;
     delayMicroseconds(delay_steps);
+
   }
 }
