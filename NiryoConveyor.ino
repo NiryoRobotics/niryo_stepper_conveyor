@@ -79,7 +79,7 @@ void setup() {
   init_driver(); // init Stepper driver
   relaxed_mode_with_resistance();
   pinMode(potentiometer_pin, INPUT_PULLUP);
-  pinMode(digital_input_pin, INPUT);
+  pinMode(digital_input_pin, INPUT_PULLUP);
   EMA_S = analogRead(potentiometer_pin);  //set EMA S for t=1
   SerialUSB.println("-------------- SETUP FINISHED --------------");
 }
@@ -146,12 +146,13 @@ void autonomeConveyorControl()
     external_conveyor_speed = 0;
 
   }
-
+ 
   // if sensor detect an object or the speed == 0 , stop conveyor
   if ((external_conveyor_speed == 0) or (digitalRead(digital_input_pin) == LOW) or (potentiometer_value == 1023))
   {
     relaxed_mode_with_resistance();
     fan_LOW();
+    
   }
   else
   {
