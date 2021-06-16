@@ -1,7 +1,7 @@
 /*
     NiryoStepper.ino
     author Sarra EL GHALI
-    Version 1.0
+    Version 1.1.0
     Copyright (C) 2020 Niryo
 
     This program is free software: you can redistribute it and/or modify
